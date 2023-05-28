@@ -8,7 +8,7 @@
                 </li>
                 @foreach($categories as $cat)
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="#">{{$cat->title}} ({{ $cat->post->count() }})</a>
+                        <a class="nav-link text-dark" href="{{ route('category', [$cat->id, $cat->slug]) }}">{{$cat->title}} ({{ $cat->post->count() }})</a>
                     </li>
                 @endforeach
             </ul>

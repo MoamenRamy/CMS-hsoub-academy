@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,9 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('layouts.main');
-});
+Route::get('/', [PostController::class, 'index']);
+Route::resource('/post', PostController::class);
+Route::post('/search', [PostController::class, 'search'])->name('search');
+Route::get('/category/{id}/{slug}', [PostController::class, 'getByCategory'])->name('category');
+
+
 
 Route::middleware([
     'auth:sanctum',
@@ -26,3 +30,4 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 });
+
