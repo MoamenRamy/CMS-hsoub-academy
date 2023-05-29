@@ -32,6 +32,34 @@
                 <img class="mb-4 mx-auto post-img" src="{{ asset('/storage/image/'.$post->image_path) }}" alt="">
             @endif
             <p class="lh-lg">{!! $post->body !!}</p>
+            @auth
+                <!-- comments form -->
+                <div class="row form-group mt-5" >
+                    <div class="col-lg-12 col-md-6 col-xs-11">
+                        <form action="{{ route('comment.store') }}" id="comments" method="post">
+                            @csrf
+                            <div class="form-group">
+                                <textarea class="form-control @error('body') is-invalid @enderror" rows="5" name="body" placeholder="أضف تعليقًا ..."></textarea>
+                                @error('body')
+                                    <span class="invalid-feedback">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <button type="submit" class="btn btn-outline-dark mt-3">تعليق</button>
+                            <input type="hidden" name="post_id" value="{{$post->id}}">
+                        </form>
+                    </div>
+                </div>
+            @else
+                <div class="alert alert-info mt-3" role="alert">
+                    يرجى تسجيل الدخول لكي تستطيع وضع تعليق
+                </div>
+            @endauth
+        </div>
+        <div id="comments" class="p-0 word-break container mt-5">
+            <h4 class="mb-5">التعليقات</h4>
+            @include('comments.all', ['comments' => $comments, 'post_id' => $post->id])
         </div>
     </div>
     @include('partials.slidebar')

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,8 @@ Route::resource('/post', PostController::class);
 Route::post('/search', [PostController::class, 'search'])->name('search');
 Route::get('/category/{id}/{slug}', [PostController::class, 'getByCategory'])->name('category');
 
+Route::resource('/comment', CommentController::class);
+Route::post('/reply/store', [CommentController::class, 'replyStore'])->name('reply.add');
 
 
 Route::middleware([
