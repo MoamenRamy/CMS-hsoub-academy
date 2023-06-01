@@ -9,6 +9,8 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+        {{-- alert --}}
+        <link rel="stylesheet" href="{!! asset('theme/css/sb-admin-2.min.css') !!}">
         <style>
 
         <style>
@@ -89,9 +91,104 @@
         <script src="https://kit.fontawesome.com/160daa7df6.js" crossorigin="anonymous"></script>
         {{-- ckeditor --}}
         <script src="https://cdn.ckeditor.com/ckeditor5/38.0.1/classic/ckeditor.js"></script>
-
         {{-- jquery cdn --}}
         <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+        {{-- pusher --}}
+        <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+        <script>
+
+            // Enable pusher logging - don't include this in production
+            Pusher.logToConsole = true;
+
+            var pusher = new Pusher('a79f5c0103d5bba8e980', {
+                cluster: 'mt1'
+            });
+
+            var channel = pusher.subscribe('my-channel');
+                channel.bind('my-event', function(data) {
+                alert(JSON.stringify(data));
+            });
+        </script>
+        {{-- alert --}}
+        <script src="{!! asset('theme/js/sb-admin-2.min.js') !!}"></script>
+        {{-- notifications --}}
+        <script type="module">
+            @if(Auth::check())
+                var post_userId = {{Auth::user()->id}};
+                Echo.private(`real-notification.${post_userId}`)
+                .listen('CommentNotification', (data) => {
+                    var notificationsWrapper = $('.alert-dropdown');
+                    var notificationsToggle = notificationsWrapper.find('a[data-bs-toggle]');
+                    var notificationsCountElem = notificationsToggle.find('span[data-count]');
+                    var notificationsCount = parseInt(notificationsCountElem.text());
+                    var notifications = notificationsWrapper.find('div.alert-body');
+
+                    var existingNotifications = notifications.html();
+                    var newNotificationHtml = '<a class="dropdown-item d-flex align-items-center" href="#">\
+                                                    <div class="ml-3">\
+                                                        <div">\
+                                                            <img style="float:right" src='+data.user_image+' width="50px" class="rounded-full"/>\
+                                                        </div>\
+                                                    </div>\
+                                                    <div>\
+                                                        <div class="small text-gray-500">'+data.date+'</div>\
+                                                        <span>'+data.user_name+' وضع تعليقًا على المنشور <b>'+data.post_title+'<b></span>\
+                                                    </div>\
+                                                </a>';
+                    notifications.html(newNotificationHtml + existingNotifications);
+                    notificationsCount += 1;
+                    notificationsWrapper.find('.notif-count').text(notificationsCount);
+                    notificationsWrapper.show();
+                });
+            @endif
+        </script>
+
+        <script>
+            var token = '{{ Session::token() }}';
+            var urlNotify = '{{ route('notification') }}';
+
+            $('#alertsDropdown').on('click', function(event) {
+                event.preventDefault();
+                var notificationsWrapper = $('.alert-dropdown');
+                var notificationsToggle = notificationsWrapper.find('a[data-bs-toggle]');
+                var notificationsCountElem = notificationsToggle.find('span[data-count]');
+
+                notificationsCount = 0;
+                notificationsCountElem.attr('data-count', notificationsCount);
+                notificationsWrapper.find('.notif-count').text(notificationsCount);
+                notificationsWrapper.show();
+
+                $.ajax({
+                    method: 'POST',
+                    url: urlNotify,
+                    data: {
+                        _token: token
+                    },
+                    success : function(data) {
+                        var resposeNotifications = "";
+                        $.each(data.someNotifications , function(i, item) {
+                            var post_slug = "{{ route('post.show', ':post_slug') }}#comments";
+                            post_slug = post_slug.replace(':post_slug', item.post_slug);
+                            resposeNotifications += '<a class="dropdown-item d-flex align-items-center" href='+post_slug+'>\
+                                                        <div class="ml-3">\
+                                                            <div">\
+                                                                <img style="float:right" src='+item.user_image+' width="50px" class="rounded-full"/>\
+                                                            </div>\
+                                                        </div>\
+                                                        <div>\
+                                                            <div class="small text-gray-500">'+item.date+'</div>\
+                                                            <span>'+item.user_name+' وضع تعليقًا على المنشور <b>'+item.post_title+'<b></span>\
+                                                        </div>\
+                                                    </a>';
+
+
+                            $('.alert-body').html(resposeNotifications);
+                    });
+                    }
+                });
+            });
+        </script>
+
         @yield('script')
     </body>
 </html>

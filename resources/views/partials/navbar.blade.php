@@ -6,15 +6,15 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
-            <li class="nav-item me-5">
+            <li class="nav-item me-5" style="list-style: none;">
                 <a class="nav-link active" aria-current="page" href="{{ url('/') }}">الصفحة الرئيسية</a>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown" style="list-style: none;">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     الصفحات
                 </a>
 
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown" style="list-style: none;">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Dropdown
                 </a>
@@ -30,13 +30,13 @@
 
         <ul class="navbar-nav mx-auto">
             @auth
-                <li class="nav-item">
+                <li class="nav-item" style="list-style: none;">
                     <a class="nav-link" href="{{ route('post.create') }}"><i class="fa fa-plus fa-fw"></i>موضوع جديد</a>
                 </li>
             @endauth
 
             <!-- Search Box -->
-            <li>
+            <li style="list-style: none;">
                 <form class="d-flex" method="post" action="{{ route('search') }}">
                     @csrf
                     <input class="form-control ms-2" name="keyword" type="search" placeholder="ابحث عن منشور..." aria-label="Search">
@@ -46,16 +46,39 @@
         </ul>
 
         <ul class="navbar-nav mr-auto">
+
+            <div class="topbar" style="z-index: 1;">
+                @auth
+                        <!-- Nav Item - Alerts -->
+                        <li class="nav-item dropdown no-arrow alert-dropdown mx-1" style="list-style: none">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-bell fa-fw fa-lg"></i>
+                                <!-- Counter - Alerts -->
+                                <span class="badge badge-danger badge-counter notif-count" data-count="{{ App\Models\Alert::where('user_id', Auth::user()->id)->first()->alert }}">{{ App\Models\Alert::where('user_id', Auth::user()->id)->first()->alert }}</span>
+                            </a>
+                            <!-- Dropdown - Alerts -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right text-right mt-2 mr-auto"
+                                aria-labelledby="alertsDropdown">
+                                <div class="alert-body">
+
+                                </div>
+                                <a class="dropdown-item text-center small text-gray-500" href="{{ route('all.Notification') }}">عرض جميع الإشعارات</a>
+                            </div>
+                        </li>
+                @endauth
+            </div>
+
             @guest
-                <li class="nav-item my-auto">
+                <li class="nav-item my-auto" style="list-style: none;">
                     <a class="nav-link" href="{{ route('login') }}">{{ __('تسجيل الدخول') }}</a>
                 </li>
 
-                <li class="nav-item my-auto">
+                <li class="nav-item my-auto" style="list-style: none;">
                     <a class="nav-link" href="{{ route('register') }}">{{ __('إنشاء حساب') }}</a>
                 </li>
             @else
-                <li class="nav-item dropdown justify-content-left my-auto">
+                <li class="nav-item dropdown justify-content-left my-auto" style="list-style: none;">
                     <a id="navbarDropdown" class="nav-link" href="#" data-bs-toggle="dropdown">
                         <img class="h-8 w-8 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
                     </a>
