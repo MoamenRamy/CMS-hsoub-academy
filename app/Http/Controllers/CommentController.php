@@ -126,6 +126,8 @@ class CommentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $comment = $this->comment::find($id);
+        $comment->delete();
+        return back()->with('success', 'تم حذف التعليق بنجاح');
     }
 }

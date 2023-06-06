@@ -3,9 +3,32 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class UserController extends Controller
 {
+
+    public $user;
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
+    public function getPostByUser($id)
+    {
+        $contents = $this->user::with('posts')->find($id);
+
+        return view('user.profile', compact('contents'));
+    }
+
+    public function getCommentByUser($id)
+    {
+        $contents = $this->user::with('comments')->find($id);
+
+        return view('user.profile', compact('contents'));
+    }
+
     /**
      * Display a listing of the resource.
      */

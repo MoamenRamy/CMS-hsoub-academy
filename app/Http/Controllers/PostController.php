@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Slug;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -70,15 +71,33 @@ class PostController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $post = $this->post::find($id);
+
+        return view('posts.edit', compact('post'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $slug)
     {
-        //
+        $data = $this->validate($request, [
+            'title' => 'required',
+            'body' => 'required',
+        ]);
+
+        $data['slug'] = Slug::uniqueSlug($request->title, 'posts');
+        $data['category_id'] = $request->category_id;
+
+        // check profile image
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . $file->getClientOriginalName();
+            $file->storeAs('public/image/', $filename);
+        }
+
+        $request->user()->posts()->where('slug', $slug)->update($data + ['image_path' => $filename ?? 'default.jpg']);
+        return redirect(route('post.show', $data['slug']))->with('success', 'تم تعديل المنشور بنجاح');
     }
 
     /**
@@ -86,7 +105,11 @@ class PostController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $post = $this->post::find($id);
+
+        $post->delete();
+
+        return back()->with('success', 'تم حذف المنشور بنجاح');
     }
 
     public function search(Request $request)
