@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -34,7 +35,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        return view('admin.users.index', ['users' => $this->user::with('role')->get()]);
     }
 
     /**
@@ -50,7 +51,25 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+        ]);
+
+        $password = Hash::make($request->password);
+        $role = $request->role_id;
+
+        $user = $this->user;
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = $password;
+        $user->role_id = $role;
+
+        $user->save();
+
+        return back()->with('success', 'تم اضافه المستخدم بنجاح');
     }
 
     /**
@@ -66,7 +85,9 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = $this->user::find($id);
+
+        return view('admin.users.edit', compact('user'));
     }
 
     /**
@@ -74,7 +95,20 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $data = $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required'
+        ]);
+
+        $user = $this->user->find($id);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->role_id = $request->role_id;
+
+        $user->save();
+
+        return back()->with('success', 'تم تعديل معلومات المستخدم');
     }
 
     /**
@@ -82,6 +116,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $this->user->find($id)->delete();
+
+        return back()->with('success', 'تم حذف المستخدم بنجاح');
     }
 }

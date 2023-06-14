@@ -1,10 +1,15 @@
 <?php
 
+use App\Http\Controllers\admin\DashController;
+use App\Http\Controllers\admin\PostController as AdminPostController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
-use App\Models\Role;
+use App\Http\Controllers\admin\RoleController;
+use App\Http\Controllers\admin\PermissionController;
+use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,6 +36,19 @@ Route::get('/notification', [NotificationController::class, 'allNotification'])-
 
 Route::get('/profile/{id}', [UserController::class, 'getPostByUser'])->name('profile');
 Route::get('/profile/{id}/comments', [UserController::class, 'getCommentByUser'])->name('user_comments');
+
+Route::group(['prefix' => 'admin', 'middleware' => 'Admin'],function(){
+    Route::get('/dashboard', [DashController::class, 'index'])->name('admin.dashboard');
+    Route::resource('/category', CategoryController::class);
+    Route::resource('/posts', AdminPostController::class);
+    Route::resource('/role', RoleController::class);
+    Route::get('/permission', [PermissionController::class, 'index'])->name('permissions');
+    Route::post('/permission', [PermissionController::class, 'store'])->name('permissions');
+    Route::resource('/user', UserController::class);
+    Route::resource('/page', PageController::class);
+});
+
+Route::get('permission/byRole', [RoleController::class, 'getByRole'])->name('permission_byRole')->middleware('Admin');
 
 Route::middleware([
     'auth:sanctum',

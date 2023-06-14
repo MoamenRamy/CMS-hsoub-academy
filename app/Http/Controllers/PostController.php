@@ -15,6 +15,8 @@ class PostController extends Controller
     public function __construct(Post $post)
     {
         $this->post = $post;
+
+        $this->middleware('verified')->only('create');
     }
 
     /**
@@ -73,6 +75,8 @@ class PostController extends Controller
     {
         $post = $this->post::find($id);
 
+        abort_unless(auth()->user()->can('edit-post', $post), 403);
+
         return view('posts.edit', compact('post'));
     }
 
@@ -108,6 +112,9 @@ class PostController extends Controller
         $post = $this->post::find($id);
 
         $post->delete();
+
+        abort_unless(auth()->user()->can('delete-post', $post), 403);
+
 
         return back()->with('success', 'تم حذف المنشور بنجاح');
     }

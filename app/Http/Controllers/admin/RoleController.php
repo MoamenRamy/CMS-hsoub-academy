@@ -1,25 +1,29 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\admin;
 
-use App\Models\Category;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Role;
 
-class CategoryController extends Controller
+class RoleController extends Controller
 {
 
-    public $category;
+    public $role;
 
-    public function __construct(Category $category)
+    public function __construct(Role $role)
     {
-        $this->category = $category;
+        $this->role = $role;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('admin.category', ['categories' => $this->category->all()]);
+        $roles = $this->role::all();
+
+        return view('admin.roles.all', compact('roles'));
     }
 
     /**
@@ -36,12 +40,16 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'title' => 'required'
+            'name' => 'required'
         ]);
 
-        $this->category->create($request->all() + ['slug'=> $request->title]);
+        $role = $this->role;
 
-        return back()->with('success', 'تم اضافه التصنيف بنجاح');
+        $role->role = $request->name;
+
+        $role->save();
+
+        return back()->with('success', 'تم اضافه الدور بنجاح');
     }
 
     /**
@@ -73,8 +81,15 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->category->find($id)->delete();
+        $this->role->find($id)->delete();
 
-        return back()->with('success', 'تم حذف التصنيف بنجاح');
+        return back()->with('success', 'تم حذف الدور بنجاح');
+    }
+
+    public function getByRole(Request $data)
+    {
+        $permission = $this->role->find($data->id)->permissions()->pluck('permission_id');
+
+        return $permission;
     }
 }

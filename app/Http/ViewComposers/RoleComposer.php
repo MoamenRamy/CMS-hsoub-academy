@@ -6,7 +6,7 @@ use App\Repositories\UserRepository;
 use Illuminate\View\View;
 use App\Models\Role;
 
-class CategoryComposer
+class RoleComposer
 {
     protected $roles;
 

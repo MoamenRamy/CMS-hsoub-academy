@@ -10,7 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
     use HasFactory;
@@ -82,5 +82,17 @@ class User extends Authenticatable
     public function alert()
     {
         return $this->hasOne(Alert::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->role->id == 1;
+    }
+
+    public function hasAllow($permission)
+    {
+        $role = $this->role()->first();
+
+        return $role->permissions()->whereName($permission)->first() ? true : false;
     }
 }
